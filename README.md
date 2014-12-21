@@ -1,13 +1,13 @@
 
-The King's Fund digital archive - Django implementation
+# The King's Fund digital archive - Django implementation
 
-Development setup
+## Development setup
 
-sudo apt-get update
-sudo apt-get install python-pip
-sudo pip install virtualenv
-git clone git@github.com:drtjmb/kingsf2.git
-cd kingsf2
-virtualenv venv
-source venv/bin/activate
-pip install -r modules.txt
+1. sudo apt-get update
+2. sudo apt-get install python-pip
+3. sudo pip install virtualenv
+4. git clone git@github.com:drtjmb/kingsf2.git
+5. cd kingsf2
+6. virtualenv venv
+7. source venv/bin/activate
+8. pip install -r modules.txt
