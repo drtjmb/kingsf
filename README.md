@@ -11,3 +11,27 @@
 6. virtualenv venv
 7. source venv/bin/activate
 8. pip install -r modules.txt
+
+## Proposed layout
+
+kingsf (project - top level site)
+: home
+: search
+: view
+
+ingest (app - ingest marc and OCR data)
+: marc
+: abbyy_xml
+: alto_xml
+
+search (app - abstract search backend)
+: index
+: search
+: get
+
+wp (app - wellcome player backend)
+: search
+: autocomplete
+: biblio
+: pdf
+: prepare
