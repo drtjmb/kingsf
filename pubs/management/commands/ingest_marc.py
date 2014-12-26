@@ -3,7 +3,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from pymarc import MARCReader
 import re
-from pubs.models import Publication
+from pubs.models import Publication, Author
 import os.path
 
 class Command(BaseCommand):
@@ -29,11 +29,9 @@ class Command(BaseCommand):
 
                 try:
                     pub = Publication.objects.get(pk=id)
-                    pub.delete()
                 except Publication.DoesNotExist:
-                    pass
+                    pub = Publication(pk=id)
 
-                pub = Publication(pk=id)
                 print '%s' % pub.id
 
                 if record.title() is not None:
@@ -52,6 +50,8 @@ class Command(BaseCommand):
                         pub.summary = summary
 
                 pub.save()
+
+                Author.objects.filter(publication=pub).delete()
 
                 for author in record.get_fields('100') + record.get_fields('700'):
                     if author['e'] is None:
