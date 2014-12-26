@@ -91,3 +91,13 @@ HAYSTACK_CONNECTIONS = {
         'INDEX_NAME': 'kingsf',
     },
 }
+
+from os.path import join
+
+TEMPLATE_DIRS = (
+    join(BASE_DIR, 'templates'),
+)
+
+STATICFILES_DIRS = (
+    join(BASE_DIR, 'static'),
+)

@@ -1,0 +1,60 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>{% block title %} {% endblock %}</title>
+    <link href="{% static favicon.ico %}" rel="icon" type="image/x-icon" />
+    <link href="{% static favicon.ico %}" rel="shortcut icon" type="image/x-icon" />
+    <link href="{% static "style/resets.css" %}" rel="stylesheet" />
+    <link href="{% static "style/archive-styles.css" %}" rel="stylesheet" />
+    <script src="http://fast.fonts.net/jsapi/0cd103f4-3a63-4e00-84ad-a86e1984fac6.js" type="text/javascript"></script>
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+</head>
+
+<body class="archive">
+
+    <div class="kf-header clearfix">
+        <div class="page-header-inner-wrapper">
+            <a href="http://www.kingsfund.org.uk" id="site-name" title="The King's Fund" onclick="_gaq.push(['_trackEvent', 'Link to main website', 'Logo click', 'http://www.kingsfund.org.uk']);">The King's Fund<span class="slogan">Ideas that change health care</span></a>
+            <div class="block">
+                <ul class="external-links">
+                    <li><a href="http://kingsfund.koha-ptfs.eu/" onclick="_gaq.push(['_trackEvent', 'Link to library database', 'Text click', 'http://kingsfund.koha-ptfs.eu/']);">Search the full library database >></a></li>
+                    <li><a href="http://www.kingsfund.org.uk/" onclick="_gaq.push(['_trackEvent', 'Link to main website', 'Text click', 'http://www.kingsfund.org.uk']);">The King's Fund website >></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="archive-header clearfix">
+        <div class="page-header-inner-wrapper">
+            <h1 id="archive-title"><a href="http://archive.kingsfund.org.uk" title="Digital archive">Digital archive</a></h1>
+            <form id="archive-search" class="archive-search" action="search" method="get">
+                {{ form }}
+            </form>
+        </div>
+    </div>
+
+    <div class="main clearfix">
+        <div class="page-content-inner-wrapper">
+            <div class="container content">
+                {% block content %} {% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <div class="footer clearfix">
+        <div class="page-footer-inner-wrapper">
+            <ul class="footer-links">
+                <li><a href="http://www.kingsfund.org.uk/library">Contact us</a></li>
+                <li><a href="http://www.kingsfund.org.uk/forms/make-enquirygive-feedback">Feedback</a></li>
+                <li><a href="http://www.kingsfund.org.uk/terms-and-conditions">T&amp;Cs</a></li>
+                <li><a href="http://www.kingsfund.org.uk/cookies-privacy-policy">Cookies and privacy</a></li>
+                <li><a href="http://www.kingsfund.org.uk/copyright">&copy; The King's Fund, 2014</a></li>
+            </ul>
+        </div>
+    </div>
+
+</body>
+
+</html>
