@@ -10,6 +10,12 @@ class Publication(models.Model):
     def __str__(self):
         return self.title
 
+    def get_author_names(self):
+        names = []
+        for author in Author.objects.filter(publication=self):
+            names.append(author.name)
+        return names
+
 class Author(models.Model):
     name = models.CharField(max_length=200)
     publication = models.ForeignKey(Publication)
