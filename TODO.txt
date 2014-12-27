@@ -1,0 +1,19 @@
+Use stored fields eg
+http://django-haystack.readthedocs.org/en/latest/searchindex_api.html
+
+Use prepare_FOO to prepare the authors field for indexing
+http://django-haystack.readthedocs.org/en/latest/searchindex_api.html
+
+Use index_queryset to only index "active" items (rename show to active)
+
+advanced search should use a ModelSearchIndex (ie creates an index based on the model)?
+
+add carousel
+
+add include_in_showcase to allow KF to choose items to appear in carousel (via /admin)
+
+ingest OCR XML
+
+index full text
+
+index OCR lines
