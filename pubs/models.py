@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.urlresolvers import reverse
 
 class Publication(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -15,6 +16,9 @@ class Publication(models.Model):
         for author in Author.objects.filter(publication=self):
             names.append(author.name)
         return names
+
+    def get_absolute_url(self):
+        return reverse('pubs.views.detail', args=['%06d' % self.id])
 
 class Author(models.Model):
     name = models.CharField(max_length=200)

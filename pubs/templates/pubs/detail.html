@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}{{ pub.title }}{% endblock %}
+
+{% block content %}
+    <h1>{{ pub.title }}</h1>
+    <ul>
+    {% for author in pub.get_author_names %}
+        <li>{{author}}</li>
+    {% endfor %}
+    </ul>
+    <p>{{ pub.summary }}</p>
+    <p>{{ pub.year }}</p>
+{% endblock %}
