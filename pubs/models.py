@@ -17,6 +17,13 @@ class Publication(models.Model):
             names.append(author.name)
         return names
 
+    def get_fulltext(self):
+        text = ''
+        for page in self.page_set.all():
+            for line in page.line_set.all():
+                text += " " + line.text
+        return text
+
     def get_absolute_url(self):
         return reverse('pubs.views.detail', args=['%06d' % self.id])
 
@@ -32,14 +39,14 @@ class Page(models.Model):
     publication = models.ForeignKey(Publication)
 
     def __str__(self):
-        return self.number
+        return str(self.number)
 
 class Line(models.Model):
     text = models.TextField()
-    x = models.IntegerField()
-    y = models.IntegerField()
-    w = models.IntegerField()
-    h = models.IntegerField()
+    l = models.IntegerField()
+    t = models.IntegerField()
+    r = models.IntegerField()
+    b = models.IntegerField()
     page = models.ForeignKey(Page)
 
     def __str__(self):
