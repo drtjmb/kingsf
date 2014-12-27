@@ -59,7 +59,7 @@
                 <p>
                     <a href="{{ result.object.get_absolute_url }}">{{ result.object.title }}</a>
                     <br>
-                    {% highlight result.text with query %}
+                    {% highlight result.object.summary with query max_length 400 %}
                 </p>
             {% empty %}
                 <p>No results found.</p>
