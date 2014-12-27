@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load more_like_this %}
+
 {% block title %}{{ pub.title }}{% endblock %}
 
 {% block content %}
@@ -11,4 +13,12 @@
     </ul>
     <p>{{ pub.summary }}</p>
     <p>{{ pub.year }}</p>
+
+    <h2>More like this</h2>
+    {% more_like_this pub as related_content limit 5  %}
+    <ul>
+    {% for rc in related_content %}
+        <li><a href="{{ rc.object.get_absolute_url }}">{{rc.object.title}}</a></li>
+    {% endfor %}
+    </ul>
 {% endblock %}
