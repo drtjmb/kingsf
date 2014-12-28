@@ -3,7 +3,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from pymarc import MARCReader
 import re
-from pubs.models import Publication, Author
+from pubs.models import Publication
 import os.path
 
 class Command(BaseCommand):
@@ -16,6 +16,8 @@ class Command(BaseCommand):
         if not os.path.isfile(filename):
             raise CommandError('File does not exist %s' % filename)
 
+        pubs = []
+
         with open(filename,'rb') as fh:
             reader = MARCReader(fh, to_unicode=True)
             for record in reader:
@@ -27,12 +29,8 @@ class Command(BaseCommand):
                 if id is None:
                     continue
 
-                try:
-                    pub = Publication.objects.get(pk=id)
-                except Publication.DoesNotExist:
-                    pub = Publication(pk=id)
-
-                print '%s' % pub.id
+                pub = Publication(pk=id)
+                pubs.append(pub)
 
                 if record.title() is not None:
                     pub.title = record.title()
@@ -49,11 +47,10 @@ class Command(BaseCommand):
                     if summary is not None:
                         pub.summary = summary
 
-                pub.save()
-
-                Author.objects.filter(publication=pub).delete()
-
+                authors = []
                 for author in record.get_fields('100') + record.get_fields('700'):
                     if author['e'] is None:
-                        pub.author_set.create(name=author['a'])
+                        authors.append(author['a'].strip())
+                pub.authors = ';'.join(authors)
 
+        Publication.objects.bulk_create(pubs)
