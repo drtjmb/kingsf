@@ -12,6 +12,9 @@
 7. source venv/bin/activate
 8. pip install -r modules.txt
 
+mysql> CREATE DATABASE kingsf CHARACTER SET utf8 COLLATE utf8_general_ci;
+mysql> GRANT ALL PRIVILEGES ON kingsf.* TO 'kingsf'@'localhost' IDENTIFIED BY '.....';
+
 ## Proposed layout
 
 kingsf (project - top level site)
