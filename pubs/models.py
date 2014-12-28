@@ -19,9 +19,8 @@ class Publication(models.Model):
 
     def get_fulltext(self):
         text = ''
-        for page in self.page_set.all():
-            for line in page.line_set.all():
-                text += " " + line.text
+        for page in self.page_set.order_by('number'):
+            text += " " + page.get_fulltext()
         return text
 
     def get_absolute_url(self):
@@ -40,6 +39,12 @@ class Page(models.Model):
 
     def __str__(self):
         return str(self.number)
+
+    def get_fulltext(self):
+        text = ''
+        for line in self.line_set.order_by('pk'):
+            text += " " + line.text
+        return text
 
 class Line(models.Model):
     text = models.TextField()
