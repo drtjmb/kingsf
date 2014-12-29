@@ -14,34 +14,22 @@ class Publication(models.Model):
         return self.title
 
     def get_fulltext(self):
-        text = ''
-        for page in self.page_set.order_by('number'):
-            text += " " + page.get_fulltext()
-        return text
+        text = []
+        for line in self.line_set.order_by('number','pk'):
+            text.append(line.text)
+        return ' '.join(text)
 
     def get_absolute_url(self):
         return reverse('pubs.views.detail', args=['%06d' % self.id])
 
-class Page(models.Model):
-    number = models.IntegerField()
-    publication = models.ForeignKey(Publication)
-
-    def __str__(self):
-        return str(self.number)
-
-    def get_fulltext(self):
-        text = ''
-        for line in self.line_set.order_by('pk'):
-            text += " " + line.text
-        return text
-
 class Line(models.Model):
+    publication = models.ForeignKey(Publication)
+    page = models.IntegerField()
     text = models.TextField()
     l = models.IntegerField()
     t = models.IntegerField()
     r = models.IntegerField()
     b = models.IntegerField()
-    page = models.ForeignKey(Page)
 
     def __str__(self):
         return self.text

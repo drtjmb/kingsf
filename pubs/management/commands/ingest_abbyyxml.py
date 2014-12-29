@@ -1,32 +1,51 @@
 from django.core.management.base import BaseCommand, CommandError
 from xml.etree import ElementTree
-from pubs.models import Publication, Page, Line
-import os.path
+from pubs.models import Publication, Line
+from os.path import isfile, isdir, join
+from glob import glob
+import re
 
 class Command(BaseCommand):
-    args = '<pubid> <page> <filename>'
+    args = '<pubid> <filename>'
     help = 'Ingests ABBYY OCR (XML)'
 
     def handle(self, *args, **options):
 
         id = args[0]
-        try:
-            pub = Publication.objects.get(pk=id)
-        except Publication.DoesNotExist:
-            print 'Missing pub %d' % id
-            return
+        pub, created = Publication.objects.get_or_create(pk=id)
 
-        page = args[1]
-        # TODO Page may already exist
-        p = pub.page_set.create(number=page)
+        dir = args[1]
+        if not isdir(dir):
+            raise CommandError('Not a dir: %s' % dir)
 
-        filename = args[2]
-        if not os.path.isfile(filename):
-            raise CommandError('File does not exist %s' % filename)
+        lines = []
 
-        with open(filename,'rb') as fh:
-            tree = ElementTree.parse(fh)
-            root = tree.getroot()
+        for filename in sorted(glob(join(dir,'*.xml'))):
 
-            for l in root.iter('{http://www.abbyy.com/FineReader_xml/FineReader10-schema-v1.xml}line'):
-                p.line_set.create(text=l.find('*').text,l=l.get('l'),t=l.get('t'),r=l.get('r'),b=l.get('b'))
+            if not isfile(filename):
+                continue
+
+            page = None
+            match = re.search(r'(\d+)\.xml$', filename)
+            if match:
+                page = match.group(1)
+
+            with open(filename,'rb') as fh:
+                tree = ElementTree.parse(fh)
+                root = tree.getroot()
+
+                for line in root.iter('{http://www.abbyy.com/FineReader_xml/FineReader10-schema-v1.xml}line'):
+                    lines.append(
+                        Line(
+                            publication=pub,
+                            page=page,
+                            text=line.find('*').text,
+                            l=line.get('l'),
+                            t=line.get('t'),
+                            r=line.get('r'),
+                            b=line.get('b')
+                        )
+                    )
+
+        print '%s : %d lines' % (id, len(lines))
+        Line.objects.bulk_create(lines)
