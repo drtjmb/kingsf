@@ -7,8 +7,8 @@ class Publication(models.Model):
     authors = models.TextField()
     year = models.CharField(max_length=4)
     summary = models.TextField()
-    has_fulltext = models.BooleanField(default=False)
-    featured = models.BooleanField(default=False)
+    has_fulltext = models.BooleanField('include in search results',default=False)
+    featured = models.BooleanField('include in carousel',default=False)
 
     def __str__(self):
         return self.title
