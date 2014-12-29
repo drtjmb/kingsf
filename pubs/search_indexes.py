@@ -8,3 +8,7 @@ class PublicationIndex(indexes.SearchIndex, indexes.Indexable):
 
     def get_model(self):
         return Publication
+
+    def index_queryset(self,using=None):
+        """ Only index publications with full text """
+        return self.get_model().objects.filter(has_fulltext=True)

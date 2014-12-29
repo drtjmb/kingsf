@@ -7,7 +7,7 @@ class Publication(models.Model):
     authors = models.TextField()
     year = models.CharField(max_length=4)
     summary = models.TextField()
-    indexed = models.BooleanField(default=False)
+    has_fulltext = models.BooleanField(default=False)
     featured = models.BooleanField(default=False)
 
     def __str__(self):
@@ -15,7 +15,7 @@ class Publication(models.Model):
 
     def get_fulltext(self):
         text = []
-        for line in self.line_set.order_by('page','pk'):
+        for line in self.line_set.order_by('page','line'):
             text.append(line.text)
         return ' '.join(text)
 
@@ -28,6 +28,7 @@ class Publication(models.Model):
 class Line(models.Model):
     publication = models.ForeignKey(Publication)
     page = models.IntegerField()
+    line = models.IntegerField()
     text = models.TextField()
     l = models.IntegerField()
     t = models.IntegerField()

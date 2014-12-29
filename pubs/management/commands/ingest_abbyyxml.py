@@ -34,11 +34,12 @@ class Command(BaseCommand):
                 tree = ElementTree.parse(fh)
                 root = tree.getroot()
 
-                for line in root.iter('{http://www.abbyy.com/FineReader_xml/FineReader10-schema-v1.xml}line'):
+                for idx, line in enumerate(root.iter('{http://www.abbyy.com/FineReader_xml/FineReader10-schema-v1.xml}line'),start=1):
                     lines.append(
                         Line(
                             publication=pub,
                             page=page,
+                            line=idx,
                             text=line.find('*').text,
                             l=line.get('l'),
                             t=line.get('t'),
@@ -49,3 +50,6 @@ class Command(BaseCommand):
 
         print '%s : %d lines' % (id, len(lines))
         Line.objects.bulk_create(lines)
+
+        pub.has_fulltext = True
+        pub.save()
