@@ -1,22 +1,10 @@
 Use stored field for result citation eg
 http://django-haystack.readthedocs.org/en/latest/searchindex_api.html
 
-Use index_queryset to only index "active" items (rename show to active)
-
 advanced search should use a ModelSearchIndex (ie creates an index based on the model)?
 
-add carousel
+carousel should pick up items where featured=True
 
 add include_in_showcase to allow KF to choose items to appear in carousel (via /admin)
 
-ingest OCR XML
-
-index full text
-
-index OCR lines
-
-let elasticsearch do highlighting
-
-elasticsearch phrase search
-
-ingest OCR XML should set pub.indexed to True
+create a template for a publication 'citation' - used by carousel and by search results page
