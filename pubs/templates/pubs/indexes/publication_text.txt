@@ -1,3 +1,2 @@
-{{ object.title }}
 {{ object.summary }}
 {{ object.get_fulltext }}

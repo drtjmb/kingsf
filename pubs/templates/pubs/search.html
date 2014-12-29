@@ -53,13 +53,13 @@
 
             <h3>Results</h3>
 
-            <style>span.highlighted { background-color: yellow }</style>
+            <style>span.highlighted, em { background-color: yellow }</style>
 
             {% for result in page.object_list %}
                 <p>
                     <a href="{{ result.object.get_absolute_url }}">{{ result.object.title }}</a>
                     <br>
-                    {% highlight result.text with query max_length 400 %}
+                    {{ result.highlighted.0 | safe }}
                 </p>
             {% empty %}
                 <p>No results found.</p>
