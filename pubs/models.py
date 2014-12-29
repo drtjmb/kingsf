@@ -19,6 +19,9 @@ class Publication(models.Model):
             text.append(line.text)
         return ' '.join(text)
 
+    def get_author_list(self):
+        return self.authors.split(';')
+
     def get_absolute_url(self):
         return reverse('pubs.views.detail', args=['%06d' % self.id])
 
