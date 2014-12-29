@@ -1,7 +1,4 @@
-Use stored fields eg
-http://django-haystack.readthedocs.org/en/latest/searchindex_api.html
-
-Use prepare_FOO to prepare the authors field for indexing
+Use stored field for result citation eg
 http://django-haystack.readthedocs.org/en/latest/searchindex_api.html
 
 Use index_queryset to only index "active" items (rename show to active)
@@ -17,3 +14,9 @@ ingest OCR XML
 index full text
 
 index OCR lines
+
+let elasticsearch do highlighting
+
+elasticsearch phrase search
+
+ingest OCR XML should set pub.indexed to True
