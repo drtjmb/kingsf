@@ -15,7 +15,7 @@ class Publication(models.Model):
 
     def get_fulltext(self):
         text = []
-        for line in self.line_set.order_by('number','pk'):
+        for line in self.line_set.order_by('page','pk'):
             text.append(line.text)
         return ' '.join(text)
 
