@@ -1,0 +1,11 @@
+--- venv/lib/python2.7/site-packages/haystack/backends/elasticsearch_backend.py.orig	2015-01-01 22:56:58.073169885 +0000
++++ venv/lib/python2.7/site-packages/haystack/backends/elasticsearch_backend.py	2015-01-01 10:38:51.755480568 +0000
+@@ -707,7 +707,7 @@
+ # DRL_FIXME: Perhaps move to something where, if none of these
+ #            match, call a custom method on the form that returns, per-backend,
+ #            the right type of storage?
+-DEFAULT_FIELD_MAPPING = {'type': 'string', 'analyzer': 'snowball'}
++DEFAULT_FIELD_MAPPING = {'type': 'string', 'analyzer': 'snowball', 'term_vector': 'with_positions_offsets'}
+ FIELD_MAPPINGS = {
+     'edge_ngram': {'type': 'string', 'analyzer': 'edgengram_analyzer'},
+     'ngram':      {'type': 'string', 'analyzer': 'ngram_analyzer'},
