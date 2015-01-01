@@ -59,7 +59,9 @@
                 <p>
                     <a href="{{ result.object.get_absolute_url }}">{{ result.object.title }}</a>
                     <br>
-                    {{ result.highlighted.0 | safe }}
+                    {% for highlight in result.highlighted|slice:":3" %}
+                        {{ highlight|safe }} ...
+                    {% endfor %}
                 </p>
             {% empty %}
                 <p>No results found.</p>
