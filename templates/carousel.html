@@ -1,7 +1,25 @@
 <div class="showcase">
     {% for pub in carousel %}
         <div>
-            {{ pub.summary }}
+            <div class="result-row">
+                <div class="result clearfix ">
+                    <div class="result-image">
+                        <a href="{{ pub.get_absolute_url }}"><img src="http://iip7.da.ulcc.ac.uk//thumb/kingsf/{{ pub.get_id }}/01/0001.tif"/></a>
+                    </div>
+                    <div class="result-meta">
+                        <h2 class="title"><a href="{{ pub.get_absolute_url }}">{{ pub.title }}</a></h2>
+                        {% if pub.year %}
+                            <div class="result-meta-date">{{ pub.year }}</div>
+                        {% endif %}
+                        {% if pub.authors %}
+                            <div class="result-meta-authors">{{ pub.authors }}</div>
+                        {% endif %}
+                        {% if pub.summary %}
+                            <div class="result-meta-summary">{{ pub.summary }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
     {% endfor %}
 </div>

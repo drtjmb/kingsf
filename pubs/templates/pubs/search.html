@@ -53,16 +53,24 @@
 
             <h3>Results</h3>
 
-            <style>span.highlighted, em { background-color: yellow }</style>
-
             {% for result in page.object_list %}
-                <p>
-                    <a href="{{ result.object.get_absolute_url }}">{{ result.object.title }}</a>
-                    <br>
-                    {% for highlight in result.highlighted|slice:":3" %}
-                        {{ highlight|safe }} ...
-                    {% endfor %}
-                </p>
+            <div class="ep_search_results">
+                <div class="result-row">
+                <div class="result clearfix">
+                    <div class="result-image">
+                        <a href="{{ result.object.get_absolute_url }}"><img src="http://iip7.da.ulcc.ac.uk/thumb/kingsf/{{ result.object.id|stringformat:"06d" }}/01/0001.tif"/></a>
+                    </div>
+                    <div class="result-meta">
+                        <h2 class="title"><a href="{{ result.object.get_absolute_url }}">{{ result.object.title }}</a></h2>
+                        <div class="result-highlight">... 
+                            {% for highlight in result.highlighted %}
+                                {{ highlight|safe }} ...
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
             {% empty %}
                 <p>No results found.</p>
             {% endfor %}

@@ -412,11 +412,16 @@ div.result-meta-authors
     font-weight: bold;
 }
 
-div.result-meta-summary
+div.result-meta-summary, div.result-highlight
 {
     font-size: 0.9em;
     line-height: 1.4em;
     margin: 0.7em 0.3em 0 0;
+}
+
+div.result-highlight em
+{
+    font-weight: bold;
 }
 
 div.ep_search_reorder
