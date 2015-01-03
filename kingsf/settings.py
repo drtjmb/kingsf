@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'haystack',
     'pubs',
+    'wp',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -100,4 +101,5 @@ TEMPLATE_DIRS = (
 
 STATICFILES_DIRS = (
     join(BASE_DIR, 'static'),
+    join(BASE_DIR, 'wp/static'),
 )

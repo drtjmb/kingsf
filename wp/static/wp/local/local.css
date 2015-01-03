@@ -1,0 +1,12 @@
+/* hide page navigation 'mode', 'Help' and 'View full conditions of use' KF-79 */
+#app .headerPanel .options .centerOptions .mode,
+#app .headerPanel .options .rightOptions,
+#app .rightPanel .main .action
+{
+	display: none;
+}
+
+#app .footerPanel .search
+{
+	background-color: #027ac6;
+}

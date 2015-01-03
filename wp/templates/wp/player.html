@@ -1,0 +1,3 @@
+  {% load staticfiles %}
+  <div class="wellcomePlayer" data-uri="{% url 'wp.views.package' pub.get_id() %}" data-config="{% static 'wp/config.js' %}"></div>
+  <script type="text/javascript" id="embedWellcomePlayer" src="{% static 'wp/js/embed.js' %}"></script>

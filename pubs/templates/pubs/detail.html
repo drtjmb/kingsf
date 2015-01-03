@@ -5,16 +5,18 @@
 {% block title %}{{ pub.title }}{% endblock %}
 
 {% block content %}
-    <h1>{{ pub.title }}</h1>
-    <ul>
-    {% for author in pub.get_author_names %}
-        <li>{{author}}</li>
-    {% endfor %}
-    </ul>
-    <p>{{ pub.summary }}</p>
-    <p>{{ pub.year }}</p>
+    <style>
+        div.page-content-inner-wrapper
+  	    {
+  		    background: #333;
+  		    width: 950px;
+  		    padding: 0px;
+  	    }
+    </style>
+    {% include 'wp/player.html' %}
 
     <h2>More like this</h2>
+
     {% more_like_this pub as related_content limit 5  %}
     <ul>
     {% for rc in related_content %}

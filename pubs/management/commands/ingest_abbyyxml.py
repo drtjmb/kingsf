@@ -52,4 +52,5 @@ class Command(BaseCommand):
         Line.objects.bulk_create(lines)
 
         pub.has_fulltext = True
+        pub.num_pages = lines[-1].page
         pub.save()

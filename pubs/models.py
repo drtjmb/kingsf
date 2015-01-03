@@ -9,9 +9,13 @@ class Publication(models.Model):
     summary = models.TextField()
     has_fulltext = models.BooleanField('include in search results',default=False)
     featured = models.BooleanField('include in carousel',default=False)
+    num_pages = models.IntegerField()
 
     def __str__(self):
         return self.title
+
+    def get_id(self):
+        return '%06d' % self.id;
 
     def get_fulltext(self):
         text = []
@@ -23,7 +27,7 @@ class Publication(models.Model):
         return self.authors.split(';')
 
     def get_absolute_url(self):
-        return reverse('pubs.views.detail', args=['%06d' % self.id])
+        return reverse('pubs.views.detail', args=[self.get_id()])
 
 class Line(models.Model):
     publication = models.ForeignKey(Publication)
