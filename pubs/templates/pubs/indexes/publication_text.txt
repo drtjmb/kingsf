@@ -1,2 +1,2 @@
 {{ object.summary }}
-{{ object.get_fulltext }}
+{{ object.get_fulltext_raw }}

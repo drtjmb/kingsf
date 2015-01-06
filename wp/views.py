@@ -5,6 +5,7 @@ from django.http import HttpResponse, Http404
 from pubs.models import Publication, Line
 from collections import OrderedDict
 from haystack.query import SearchQuerySet
+from django.db.models import Q
 
 def package(request, pubid):
     pub = get_object_or_404(Publication, pk=pubid)
@@ -70,11 +71,58 @@ def biblio(request, pubid):
     ])
     return HttpResponse(json.dumps(data), content_type="application/json")
 
+def find_all(a_str, sub):
+    start = 0
+    while True:
+        start = a_str.find(sub, start)
+        if start == -1: return
+        yield start
+        start += len(sub)
+
+def search(request, pubid):
+    pub = get_object_or_404(Publication, pk=pubid)
+    
+    text = pub.get_fulltext()
+    t = request.GET.get('t').lower()
+
+    data = []
+    page = None
+    n = 0
+    lines = pub.line_set.all() # TODO check lazy loading - is queryset only loaded from DB once or on each filter() ?
+    for start_pos in find_all(text, t):
+        end_pos = start_pos + len(t) - 1
+        for result in lines.filter(
+            Q(start_pos__lte=start_pos,end_pos__gte=start_pos) | # t starts in line
+            Q(start_pos__gt=start_pos,end_pos__lt=end_pos) | # t straddles line
+            Q(start_pos__lte=end_pos,end_pos__gte=end_pos) # t ends in line
+        ):
+            if page is not None and page['index'] != result.page - 1:
+                data.append(page)
+                page = None
+            if page is None:
+                page = { 'index': result.page - 1, 'rects': [] }
+            page['rects'].append({
+                'hit': n,
+                'x': result.get_x(),
+                'y': result.get_y(),
+                'w': result.get_width(),
+                'h': result.get_height(),
+                'line': result.text,
+                'publication': result.publication_id,
+                'start_pos': result.start_pos,
+                'end_pos': result.end_pos,
+                'found_pos': start_pos,
+            })
+            n += 1
+    if page is not None: data.append(page)
+        
+    return HttpResponse(json.dumps(data,indent=4), content_type="application/json")
+
 def fc(request):
     if 'callback' in request.REQUEST:
         data = {}
         data['Success'] = True
         data['Message'] = None
-        data = '%s(%s);' % (request.REQUEST['callback'], data)
+        data = '%s(%s);' % (request.REQUEST['callback'], json.dumps(data))
         return HttpResponse(data, "text/javascript")
     raise Http404
