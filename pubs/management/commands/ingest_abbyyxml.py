@@ -3,7 +3,6 @@ from xml.etree import ElementTree
 from pubs.models import Publication, Line
 from os.path import isfile, isdir, join
 from glob import glob
-from unicodedata import category
 import re
 
 class Command(BaseCommand):
@@ -20,7 +19,6 @@ class Command(BaseCommand):
             raise CommandError('Not a dir: %s' % dir)
 
         lines = []
-        start_pos = 0
 
         for filename in sorted(glob(join(dir,'*.xml'))):
 
@@ -36,39 +34,20 @@ class Command(BaseCommand):
                 tree = ElementTree.parse(fh)
                 root = tree.getroot()
 
-                for line in root.iter('{http://www.abbyy.com/FineReader_xml/FineReader10-schema-v1.xml}line'):
+                for number, line in enumerate(root.iter('{http://www.abbyy.com/FineReader_xml/FineReader10-schema-v1.xml}line')):
                    
-                    raw = line.find('*').text
-
-                    norm = raw
-                    if isinstance(norm, str):
-                        norm = norm.decode('utf-8')
-
-                    norm = u''.join(ch for ch in norm if category(ch)[0] != 'P')
-                    norm = u' '.join(norm.split()).strip().lower()
-                    if norm.endswith(u'\u00ac'): # U+00AC (not sign) introduced by abbyy
-                        norm = norm[:-1]
-                    else:
-                        norm = u'%s ' % norm # note trailing space
-
-                    end_pos = start_pos + len(norm) - 1
-
                     lines.append(
                         Line(
                             publication=pub,
                             page=page,
-                            text_raw=raw,
-                            text=norm,
-                            start_pos=start_pos,
-                            end_pos=end_pos,
+                            number=number,
+                            text=line.find('*').text,
                             l=line.get('l'),
                             t=line.get('t'),
                             r=line.get('r'),
                             b=line.get('b')
                         )
                     )
-
-                    start_pos = end_pos + 1 # next char
 
         print '%s : %d lines' % (id, len(lines))
         Line.objects.bulk_create(lines)
