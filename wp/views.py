@@ -3,6 +3,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse, Http404
 from pubs.models import Publication, Line
+from wp.models import NormFulltext, BoundingBox
 from collections import OrderedDict
 from haystack.query import SearchQuerySet
 from django.db.models import Q
@@ -29,7 +30,7 @@ def package(request, pubid):
                 'assetType': 'seadragon/dzi',
                 'assetCount': pub.num_pages,
                 'supportsSearch': "true",
-                #'autoCompletePath': reverse('wp.views.autocomplete',args=[pub.get_id]),
+                'autoCompletePath': reverse('wp.views.autocomplete',args=[pub.get_id()]),
                 'rootSection': {
                     'extensions': {
                         'accessCondition': 'Open',
@@ -80,16 +81,14 @@ def find_all(a_str, sub):
         start += len(sub)
 
 def search(request, pubid):
-    pub = get_object_or_404(Publication, pk=pubid)
-    
-    text = pub.get_fulltext()
+    ft = get_object_or_404(NormFulltext, publication_id=pubid)
     t = request.GET.get('t').lower()
 
     data = []
     page = None
     n = 0
-    lines = pub.line_set.all() # TODO check lazy loading - is queryset only loaded from DB once or on each filter() ?
-    for start_pos in find_all(text, t):
+    lines = BoundingBox.objects.filter(line__publication_id=pubid) # TODO check lazy loading - is queryset only loaded from DB once or on each filter() ?
+    for start_pos in find_all(ft.text, t):
         end_pos = start_pos + len(t) - 1
         for result in lines.filter(
             Q(start_pos__lte=start_pos,end_pos__gte=start_pos) | # t starts in line
@@ -103,20 +102,21 @@ def search(request, pubid):
                 page = { 'index': result.page - 1, 'rects': [] }
             page['rects'].append({
                 'hit': n,
-                'x': result.get_x(),
-                'y': result.get_y(),
-                'w': result.get_width(),
-                'h': result.get_height(),
-                'line': result.text,
-                'publication': result.publication_id,
-                'start_pos': result.start_pos,
-                'end_pos': result.end_pos,
-                'found_pos': start_pos,
+                'x': result.x,
+                'y': result.y,
+                'w': result.w,
+                'h': result.h,
             })
             n += 1
     if page is not None: data.append(page)
         
-    return HttpResponse(json.dumps(data,indent=4), content_type="application/json")
+    return HttpResponse(json.dumps(data), content_type="application/json")
+
+def autocomplete(request, pubid):
+    sqs = SearchQuerySet().using('autocomplete').filter(publication_id=pubid,auto_text=request.GET.get('term', ''))[:10]
+    suggestions = [result.auto_text for result in sqs]
+
+    return HttpResponse(json.dumps(suggestions), content_type="application/json")
 
 def fc(request):
     if 'callback' in request.REQUEST:

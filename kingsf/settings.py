@@ -92,6 +92,13 @@ HAYSTACK_CONNECTIONS = {
         'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
         'URL': 'http://127.0.0.1:9200/',
         'INDEX_NAME': 'kingsf',
+        'EXCLUDED_INDEXES': ['wp.search_indexes.TermIndex'],
+    },
+    'autocomplete': {
+        'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'autocomplete',
+        'EXCLUDED_INDEXES': ['pubs.search_indexes.PublicationIndex'],
     },
 }
 

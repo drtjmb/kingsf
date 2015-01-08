@@ -6,7 +6,7 @@
         "mediaBaseUri": "http://iip7.da.ulcc.ac.uk",
         "prefetchBaseUri": "/wp",
         "searchBaseUri": "/wp",
-        "autoCompleteBaseUri": "http://iip7.da.ulcc.ac.uk",
+        "autoCompleteBaseUri": "",
         "moreInfoBaseUri": "",
         "loginBaseUri": "http://iip7.da.ulcc.ac.uk",
         "cropBaseUri": "http://iip7.da.ulcc.ac.uk",
