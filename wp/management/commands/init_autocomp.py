@@ -10,8 +10,8 @@ class Command(BaseCommand):
 
         stop = stopwords.words('english')
 
-        terms = set([])
         for ft in NormFulltext.objects.all():
+            terms = set([])
             words = ft.text.split()
             for i, word in enumerate(words):
                 if word in stop:
@@ -28,6 +28,7 @@ class Command(BaseCommand):
                     text = term,
                 ) for term in iter(terms)
             )
+            print ft.publication_id
 
 # Alternative approach - focuses on nouns so might be better for site-wide autocomplete?
 #
