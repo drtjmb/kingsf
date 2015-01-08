@@ -5460,7 +5460,7 @@ define('modules/wellcomeplayer-searchfooterpanel-module/autocomplete',["require"
 
                     var val = that.getTerms();
 
-                    if (val && val.length > 2 && val.indexOf(' ') == -1) {
+                    if (val && val.length > 2 /*&& val.indexOf(' ') == -1*/) {
                         that.search(val);
                     } else {
                         that.clearResults();
