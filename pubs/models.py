@@ -40,7 +40,7 @@ class Publication(models.Model):
 
 class Volume(models.Model):
     publication = models.ForeignKey(Publication)
-    volume = models.IntegerField()
+    volume = models.IntegerField(db_index=True)
 
     def __str__(self):
         return 'Vol. %s' % self.get_volume()
@@ -59,7 +59,7 @@ class Volume(models.Model):
 
 class Page(models.Model):
     volume = models.ForeignKey(Volume)
-    page = models.IntegerField()
+    page = models.IntegerField(db_index=True)
 
     def __str__(self):
         return 'p. %s' % self.get_page()
@@ -75,7 +75,7 @@ class Page(models.Model):
 
 class Block(models.Model):
     page = models.ForeignKey(Page)
-    block = models.IntegerField()
+    block = models.IntegerField(db_index=True)
     text = models.TextField()
     # bounding box (original scan)
     l = models.IntegerField()
