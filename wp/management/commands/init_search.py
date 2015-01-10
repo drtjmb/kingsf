@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from pubs.models import Publication, Block
+from pubs.models import Publication, Page, Block
 from wp.models import Fulltext, BoundingBox
 from unicodedata import category
 import re
@@ -18,38 +18,40 @@ class Command(BaseCommand):
             start_pos = 0
             fulltext = ''
 
-            for block in Block.objects.filter(page__volume__publication=pub).order_by('page__volume__volume','page__page','block'):
+            for i, page in enumerate(Page.objects.filter(volume__publication=pub).order_by('volume__volume','page')):
 
-                norm = block.text
+                for block in page.block_set.order_by('block'):
 
-                if isinstance(norm, str):
-                    norm = norm.decode('utf-8')
+                    norm = block.text
 
-                norm = u''.join(ch for ch in norm if category(ch)[0] != 'P')
-                norm = u' '.join(norm.split()).strip().lower()
-                if norm.endswith(u'\u00ac'): # U+00AC (not sign) introduced by abbyy
-                    norm = norm[:-1]
-                else:
-                    norm = u'%s ' % norm # note trailing space
-                fulltext += norm
+                    if isinstance(norm, str):
+                        norm = norm.decode('utf-8')
 
-                end_pos = start_pos + len(norm) - 1
+                    norm = u''.join(ch for ch in norm if category(ch)[0] != 'P')
+                    norm = u' '.join(norm.split()).strip().lower()
+                    if norm.endswith(u'\u00ac'): # U+00AC (not sign) introduced by abbyy
+                        norm = norm[:-1]
+                    else:
+                        norm = u'%s ' % norm # note trailing space
+                    fulltext += norm
 
-                bboxes.append(
-                    BoundingBox(
-                        publication = pub,
-                        block = block,
-                        page = block.page.page,
-                        start_pos = start_pos,
-                        end_pos = end_pos,
-                        x = int(block.l * BoundingBox.scale_factor),
-                        y = int(block.t * BoundingBox.scale_factor),
-                        w = int((block.r - block.l) * BoundingBox.scale_factor),
-                        h = int((block.b - block.t) * BoundingBox.scale_factor),
+                    end_pos = start_pos + len(norm) - 1
+
+                    bboxes.append(
+                        BoundingBox(
+                            publication = pub,
+                            block = block,
+                            page = i,
+                            start_pos = start_pos,
+                            end_pos = end_pos,
+                            x = int(block.l * BoundingBox.scale_factor),
+                            y = int(block.t * BoundingBox.scale_factor),
+                            w = int((block.r - block.l) * BoundingBox.scale_factor),
+                            h = int((block.b - block.t) * BoundingBox.scale_factor),
+                        )
                     )
-                )
 
-                start_pos = end_pos + 1 # next char
+                    start_pos = end_pos + 1 # next char
 
             fulltexts.append(
                 Fulltext(

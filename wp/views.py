@@ -88,7 +88,6 @@ def search(request, pubid):
     ft = get_object_or_404(Fulltext, publication_id=pubid)
     t = request.GET.get('t').lower()
 
-    # TODO limit number of Q() objects
     query = Q()
     for start_pos in find_all(ft.text, t):
         end_pos = start_pos + len(t) - 1
@@ -104,11 +103,11 @@ def search(request, pubid):
     bboxes = BoundingBox.objects.filter(publication_id=pubid) # TODO check lazy loading - is queryset only loaded from DB once or on each filter() ?
     for result in bboxes.filter(query):
         # TODO need page number within combined volumes
-        if page is not None and page['index'] != result.page - 1:
+        if page is not None and page['index'] != result.page:
             data.append(page)
             page = None
         if page is None:
-            page = { 'index': result.page - 1, 'rects': [] }
+            page = { 'index': result.page, 'rects': [] }
         page['rects'].append({
             'hit': n,
             'x': result.x,

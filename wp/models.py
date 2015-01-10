@@ -9,7 +9,7 @@ class BoundingBox(models.Model):
     scale_factor = 0.5
     publication = models.ForeignKey(Publication)
     block = models.ForeignKey(Block)
-    page = models.IntegerField(db_index=True)
+    page = models.IntegerField(db_index=True) # zero-indexed offset within entire publication
     x = models.IntegerField()
     y = models.IntegerField()
     w = models.IntegerField()
