@@ -11,4 +11,4 @@ class PublicationIndex(indexes.SearchIndex, indexes.Indexable):
 
     def index_queryset(self,using=None):
         """ Only index publications with full text """
-        return self.get_model().objects.filter(has_fulltext=True)
+        return self.get_model().objects.filter(volume__publication__isnull=False).distinct()

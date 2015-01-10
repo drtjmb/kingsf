@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from nltk.corpus import stopwords
-from wp.models import NormFulltext, Term
+from wp.models import Fulltext, Term
 
 class Command(BaseCommand):
     args = ''
@@ -10,7 +10,7 @@ class Command(BaseCommand):
 
         stop = stopwords.words('english')
 
-        for ft in NormFulltext.objects.all():
+        for ft in Fulltext.objects.all():
             terms = set([])
             words = ft.text.split()
             for i, word in enumerate(words):
@@ -22,13 +22,14 @@ class Command(BaseCommand):
                             break
                         terms.add(' '.join(words[i:i+x]))
 
-            Term.objects.bulk_create(
+            t = [
                 Term(
                     publication = ft.publication,
                     text = term,
                 ) for term in iter(terms)
-            )
-            print ft.publication_id
+            ]
+            Term.objects.bulk_create(t)
+            print '%s: created %d terms' % (ft.publication_id, len(t))
 
 # Alternative approach - focuses on nouns so might be better for site-wide autocomplete?
 #

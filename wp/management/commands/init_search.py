@@ -1,26 +1,26 @@
 from django.core.management.base import BaseCommand, CommandError
-from pubs.models import Publication, Line
-from wp.models import NormFulltext, BoundingBox
+from pubs.models import Publication, Block
+from wp.models import Fulltext, BoundingBox
 from unicodedata import category
 import re
 
 class Command(BaseCommand):
     args = ''
-    help = 'Prepares backend data for Wellcome Player'
+    help = 'Prepare search data for Wellcome Player'
 
     def handle(self, *args, **options):
 
         fulltexts = []
-        bboxes = []
 
-        for pub in Publication.objects.filter(has_fulltext=True):
+        for pub in Publication.objects.filter(volume__publication__isnull=False).distinct():
 
+            bboxes = []
             start_pos = 0
             fulltext = ''
 
-            for line in pub.line_set.all():
+            for block in Block.objects.filter(page__volume__publication=pub).order_by('page__volume__volume','page__page','block'):
 
-                norm = line.text
+                norm = block.text
 
                 if isinstance(norm, str):
                     norm = norm.decode('utf-8')
@@ -37,27 +37,29 @@ class Command(BaseCommand):
 
                 bboxes.append(
                     BoundingBox(
-                        line = line,
-                        page = line.page,
+                        publication = pub,
+                        block = block,
+                        page = block.page.page,
                         start_pos = start_pos,
                         end_pos = end_pos,
-                        x = int(line.l * BoundingBox.scale_factor),
-                        y = int(line.t * BoundingBox.scale_factor),
-                        w = int((line.r - line.l) * BoundingBox.scale_factor),
-                        h = int((line.b - line.t) * BoundingBox.scale_factor),
+                        x = int(block.l * BoundingBox.scale_factor),
+                        y = int(block.t * BoundingBox.scale_factor),
+                        w = int((block.r - block.l) * BoundingBox.scale_factor),
+                        h = int((block.b - block.t) * BoundingBox.scale_factor),
                     )
                 )
 
                 start_pos = end_pos + 1 # next char
 
             fulltexts.append(
-                NormFulltext(
+                Fulltext(
                     publication = pub,
                     text = fulltext
                 )
             )
 
-            print pub.id
+            BoundingBox.objects.bulk_create(bboxes)
+            print '%s: created %d bounding boxes' % (pub.get_id(), len(bboxes))
 
-        BoundingBox.objects.bulk_create(bboxes)
-        NormFulltext.objects.bulk_create(fulltexts)
+        Fulltext.objects.bulk_create(fulltexts)
+        print 'Created %d fulltexts' % len(fulltexts)

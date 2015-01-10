@@ -1,57 +1,65 @@
 from django.core.management.base import BaseCommand, CommandError
 from xml.etree import ElementTree
-from pubs.models import Publication, Line
+from pubs.models import Publication, Volume, Page, Block
 from os.path import isfile, isdir, join
 from glob import glob
 import re
 
 class Command(BaseCommand):
-    args = '<pubid> <filename>'
+    args = '<pubid> <volume> <pages_dir>'
     help = 'Ingests ABBYY OCR (XML)'
 
     def handle(self, *args, **options):
 
         id = args[0]
-        pub, created = Publication.objects.get_or_create(pk=id)
 
-        dir = args[1]
+        pub = Publication.objects.get(pk=id)
+        if pub is None:
+            raise CommandError('Publication does not exist: %s' % id)
+
+        dir = args[2]
         if not isdir(dir):
-            raise CommandError('Not a dir: %s' % dir)
+            raise CommandError('Not a directory: %s' % dir)
 
-        lines = []
+        vol = args[1]
+        volume = Volume(publication=pub,volume=vol)
+        volume.save()
+
+        blocks = []
 
         for filename in sorted(glob(join(dir,'*.xml'))):
 
             if not isfile(filename):
                 continue
 
-            page = None
+            p = None
             match = re.search(r'(\d+)\.xml$', filename)
             if match:
-                page = match.group(1)
+                p = match.group(1)
+            else:
+                print 'Could not extract page number from %s' % filename
+                continue
+
+            page = Page(volume=volume,page=p)
+            page.save()
 
             with open(filename,'rb') as fh:
                 tree = ElementTree.parse(fh)
                 root = tree.getroot()
 
-                for number, line in enumerate(root.iter('{http://www.abbyy.com/FineReader_xml/FineReader10-schema-v1.xml}line')):
+                for i, block in enumerate(root.iter('{http://www.abbyy.com/FineReader_xml/FineReader10-schema-v1.xml}line')):
                    
-                    lines.append(
-                        Line(
-                            publication=pub,
+                    blocks.append(
+                        Block(
                             page=page,
-                            number=number,
-                            text=line.find('*').text,
-                            l=line.get('l'),
-                            t=line.get('t'),
-                            r=line.get('r'),
-                            b=line.get('b')
+                            block=i,
+                            text=block.find('*').text,
+                            l=block.get('l'),
+                            t=block.get('t'),
+                            r=block.get('r'),
+                            b=block.get('b')
                         )
                     )
 
-        print '%s : %d lines' % (id, len(lines))
-        Line.objects.bulk_create(lines)
-
-        pub.has_fulltext = True
-        pub.num_pages = lines[-1].page
-        pub.save()
+        print '%s (%s): %s pages, %d blocks' % (pub.get_id(), volume.get_volume(), volume.page_set.count(), len(blocks))
+        Block.objects.bulk_create(blocks)
