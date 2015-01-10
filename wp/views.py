@@ -88,31 +88,35 @@ def search(request, pubid):
     ft = get_object_or_404(Fulltext, publication_id=pubid)
     t = request.GET.get('t').lower()
 
+    # TODO limit number of Q() objects
+    query = Q()
+    for start_pos in find_all(ft.text, t):
+        end_pos = start_pos + len(t) - 1
+        query |= Q(start_pos__lte=start_pos,end_pos__gte=start_pos) # t starts in line
+        query |= Q(start_pos__gt=start_pos,end_pos__lt=end_pos) # t straddles line
+        query |= Q(start_pos__lte=end_pos,end_pos__gte=end_pos) # t ends in line
+        if len(query) > 100:
+            break
+
     data = []
     page = None
     n = 0
     bboxes = BoundingBox.objects.filter(publication_id=pubid) # TODO check lazy loading - is queryset only loaded from DB once or on each filter() ?
-    for start_pos in find_all(ft.text, t):
-        end_pos = start_pos + len(t) - 1
-        for result in bboxes.filter(
-            Q(start_pos__lte=start_pos,end_pos__gte=start_pos) | # t starts in line
-            Q(start_pos__gt=start_pos,end_pos__lt=end_pos) | # t straddles line
-            Q(start_pos__lte=end_pos,end_pos__gte=end_pos) # t ends in line
-        ):
-            # TODO need page number within combined volumes
-            if page is not None and page['index'] != result.page - 1:
-                data.append(page)
-                page = None
-            if page is None:
-                page = { 'index': result.page - 1, 'rects': [] }
-            page['rects'].append({
-                'hit': n,
-                'x': result.x,
-                'y': result.y,
-                'w': result.w,
-                'h': result.h,
-            })
-            n += 1
+    for result in bboxes.filter(query):
+        # TODO need page number within combined volumes
+        if page is not None and page['index'] != result.page - 1:
+            data.append(page)
+            page = None
+        if page is None:
+            page = { 'index': result.page - 1, 'rects': [] }
+        page['rects'].append({
+            'hit': n,
+            'x': result.x,
+            'y': result.y,
+            'w': result.w,
+            'h': result.h,
+        })
+        n += 1
     if page is not None: data.append(page)
         
     return HttpResponse(json.dumps(data), content_type="application/json")
