@@ -53,5 +53,5 @@ class Command(BaseCommand):
                         authors.append(author['a'].strip())
                 pub.authors = ';'.join(authors)
 
-        print 'Read %s records' % len(pubs)
+        print 'Ingested %s records' % len(pubs)
         Publication.objects.bulk_create(pubs)
