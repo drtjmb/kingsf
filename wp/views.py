@@ -66,7 +66,7 @@ def package(request, pubid):
             sections.append({'sectionType': 'Volume %s' % page.volume.volume, 'assets': [i-1]})
     data['assetSequences'][0]['assets'] = p
 
-    if len(sections) == 1:
+    if len(sections) <= 1:
         sections = []
         sections.append({'sectionType': 'CoverPage', 'assets': [0]})
         sections.append({'sectionType': 'InsideCoverPage', 'assets': [1]})
