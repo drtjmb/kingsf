@@ -51,6 +51,7 @@ def package(request, pubid):
     }
 
     p = []
+    sections = []
     for i, page in enumerate(pages, start=1):
         path = 'kingsf/%s/%s/%s.tif' % (pub.get_id(), page.volume.get_volume(), page.get_page())
         p.append({
@@ -61,7 +62,16 @@ def package(request, pubid):
             'fileUri': '/%s' % path,
             'thumbnailPath': '/thumb/%s' % path,
         })
+        if page.page == 1:
+            sections.append({'sectionType': 'Volume %s' % page.volume.volume, 'assets': [i-1]})
     data['assetSequences'][0]['assets'] = p
+
+    if len(sections) == 1:
+        sections = []
+        sections.append({'sectionType': 'CoverPage', 'assets': [0]})
+        sections.append({'sectionType': 'InsideCoverPage', 'assets': [1]})
+        sections.append({'sectionType': 'TitlePage', 'assets': [2]})
+    data['assetSequences'][0]['rootSection']['sections'] = sections
 
     return HttpResponse(json.dumps(data), content_type="application/json")
 
