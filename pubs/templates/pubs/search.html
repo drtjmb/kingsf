@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
-{% load highlight %}
+{% load pubs_tags %}
 
 {% block content %}
-    <h2>Search results for {{ query }}</h2>
+    <h2>Search</h2>
 
     <form method="get" action=".">
         <table>
@@ -14,76 +14,83 @@
                 </td>
             </tr>
         </table>
-
-        {% if query %}
-
-            <!-- Begin faceting. -->
-            <h2>By Year</h2>
-
-            <div>
-                <dl>
-                    {% if facets.fields.year %}
-                        <dt>Year</dt>
-                        {# Provide only the top 5 years #}
-                        {% for year in facets.fields.year|slice:":5" %}
-                            <dd><a href="{{ request.get_full_path }}&amp;selected_facets=year_exact:{{ year.0|urlencode }}">{{ year.0 }}</a> ({{ year.1 }})</dd>
-                        {% endfor %}
-                    {% else %}
-                        <p>No year facets.</p>
-                    {% endif %}
-                </dl>
-            </div>
-
-            <h2>By Author</h2>
-
-            <div>
-                <dl>
-                    {% if facets.fields.author %}
-                        <dt>Author</dt>
-                        {# Provide only the top 5 authors #}
-                        {% for author in facets.fields.author|slice:":5" %}
-                            <dd><a href="{{ request.get_full_path }}&amp;selected_facets=author_exact:{{ author.0|urlencode }}">{{ author.0 }}</a> ({{ author.1 }})</dd>
-                        {% endfor %}
-                    {% else %}
-                        <p>No author facets.</p>
-                    {% endif %}
-                </dl>
-            </div>
-            <!-- End faceting -->
-
-            <h3>Results</h3>
-
-            {% for result in page.object_list %}
-            <div class="ep_search_results">
-                <div class="result-row">
-                <div class="result clearfix">
-                    <div class="result-image">
-                        <a href="{{ result.object.get_absolute_url }}"><img src="http://iip7.da.ulcc.ac.uk/thumb/kingsf/{{ result.object.id|stringformat:"06d" }}/01/0001.tif"/></a>
-                    </div>
-                    <div class="result-meta">
-                        <h2 class="title"><a href="{{ result.object.get_absolute_url }}">{{ result.object.title }}</a></h2>
-                        <div class="result-highlight">... 
-                            {% for highlight in result.highlighted %}
-                                {{ highlight|safe }} ...
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-                </div>
-            </div>
-            {% empty %}
-                <p>No results found.</p>
-            {% endfor %}
-
-            {% if page.has_previous or page.has_next %}
-                <div>
-                    {% if page.has_previous %}<a href="?q={{ query }}&amp;page={{ page.previous_page_number }}">{% endif %}&laquo; Previous{% if page.has_previous %}</a>{% endif %}
-                    |
-                    {% if page.has_next %}<a href="?q={{ query }}&amp;page={{ page.next_page_number }}">{% endif %}Next &raquo;{% if page.has_next %}</a>{% endif %}
-                </div>
-            {% endif %}
-        {% else %}
-            {# Show some example queries to run, maybe query syntax, something else? #}
-        {% endif %}
     </form>
+
+    {% if query %}
+
+        {% for result in page.object_list %}
+        <div class="ep_search_results">
+            <div class="result-row">
+            <div class="result clearfix">
+                <div class="result-image">
+                    <a href="{{ result.object.get_absolute_url }}"><img src="http://iip7.da.ulcc.ac.uk/thumb/kingsf/{{ result.object.id|stringformat:"06d" }}/01/0001.tif"/></a>
+                </div>
+                <div class="result-meta">
+                    <h2 class="title"><a href="{{ result.object.get_absolute_url }}">{{ result.object.title }}</a></h2>
+                    <div class="result-highlight">... 
+                        {% for highlight in result.highlighted %}
+                            {{ highlight|safe }} ...
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+        {% empty %}
+            <p>No results found.</p>
+        {% endfor %}
+
+        {% if page.has_other_pages %}
+            <div>
+                {% if page.has_previous %}
+                    <a href="{% change_page 1 %}">&laquo; First</a>
+                    <a href="{% change_page page.previous_page_number %}">&laquo; Previous</a>
+                {% endif %}
+                {% for num in paginator.page_range %}
+                    {% ifequal num page.page_number %}
+                        {{ num }}
+                    {% else %}
+                        <a href="{% change_page num %}">{{ num }}</a>
+                    {% endifequal %}
+                {% endfor %}
+                {% if page.has_next %}
+                    <a href="{% change_page page.next_page_number %}">Next &raquo;</a>
+                    <a href="{% change_page paginator.num_pages %}">Last &laquo;</a>
+                {% endif %}
+            </div>
+        {% endif %}
+
+    {% else %}
+        {# Show some example queries to run, maybe query syntax, something else? #}
+    {% endif %}
+
+    <div>
+        {% if facets.fields.year %}
+            <h3>Filter by year of publication</h3>
+            <ul>
+                {% for year in selected_facets.year %}
+                    <li><a href="{% remove_facet 'year' year %}">Remove {{ year }}</a></li>
+                {% endfor %}
+                {% for year in facets.fields.year %}
+                    {% if not selected_facets.year or year.0 not in selected_facets.year %}
+                        <li><a href="{% add_facet 'year' year.0 %}">{{ year.0 }}</a> ({{ year.1 }})</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% if facets.fields.author %}
+            <h3>Filter by author of publication</h3>
+            <ul>
+                {% for author in selected_facets.author %}
+                    <li><a href="{% remove_facet 'author' author %}">Remove {{ author }}</a></li>
+                {% endfor %}
+                {% for author in facets.fields.author %}
+                    {% if not selected_facets.author or author.0 not in selected_facets.author %}
+                        <li><a href="{% add_facet 'author' author.0 %}">{{ author.0 }}</a> ({{ author.1 }})</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
 {% endblock %}

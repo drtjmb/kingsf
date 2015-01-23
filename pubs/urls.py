@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, include, url
 from haystack.forms import FacetedSearchForm
 from haystack.query import SearchQuerySet
-from haystack.views import FacetedSearchView
+from pubs.views import FacetedSearchView
 from pubs import views
 
 sqs = SearchQuerySet().facet('year').facet('author').highlight()
